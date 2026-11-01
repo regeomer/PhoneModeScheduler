@@ -1,0 +1,47 @@
+name: Build APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Run tests
+        run: ./gradlew testDebugUnitTest
+
+      - name: Build APK
+        run: |
+          ./gradlew assembleDebug
+          cp app/build/outputs/apk/debug/app-debug.apk PhoneModeScheduler.apk
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PhoneModeScheduler-apk
+          path: PhoneModeScheduler.apk
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Phone Mode Scheduler (build ${{ github.run_number }})
+          make_latest: true
+          files: PhoneModeScheduler.apk
+          body: |
+            Download **PhoneModeScheduler.apk** below, open it on your Android phone, and allow "Install unknown apps" when asked.
+            Built from ${{ github.sha }}.

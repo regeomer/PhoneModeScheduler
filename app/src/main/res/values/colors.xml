@@ -1,0 +1,5 @@
+<resources>
+    <color name="card_bg">#FFF1F3F8</color>
+    <color name="warning_bg">#FFFFF3D6</color>
+    <color name="accent">#FF3F51B5</color>
+</resources>
